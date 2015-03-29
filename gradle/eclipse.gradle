@@ -1,0 +1,60 @@
+apply plugin: "eclipse"
+apply plugin: "eclipse-wtp"
+
+eclipse {
+	jdt {
+		 sourceCompatibility = config.java.source
+		 targetCompatibility = config.java.source
+	}
+
+	project {
+		 natures = ['org.springframework.ide.eclipse.core.springnature',
+					'org.springsource.ide.eclipse.gradle.core.nature',
+					'org.eclipse.jdt.core.javanature',
+					'org.eclipse.xtext.ui.shared.xtextNature',
+					'org.eclipse.wst.common.modulecore.ModuleCoreNature',
+					'org.eclipse.wst.common.project.facet.core.nature']
+
+		 buildCommand 'org.springframework.ide.eclipse.core.springbuilder'
+	}
+
+	classpath {
+		defaultOutputDir = file("build/classes-eclipse")
+		downloadSources = true
+
+		file {
+			withXml {
+			  def node = it.asNode()
+
+			  // add Tomcat Runtime
+			  node.appendNode("classpathentry", [kind:"con", path: config.eclipse.servletRuntimeClasspath])
+				  .appendNode("attributes")
+				  .appendNode("attribute", [name: "owner.project.facets", value: "jst.web"])
+			  
+			  // remove web container to enable source.jars in eclipse
+			  node.remove( node.find { it.@path == 'org.eclipse.jst.j2ee.internal.web.container' } )
+			}
+		}
+	}
+
+	wtp {
+		component {
+			//  wtp servlet context
+			contextPath = project.name
+			deployName = project.name
+		}
+
+		facet {
+			facet name: "jst.java", version: config.java.source
+			facet name: "jst.web",  version: config.java.servlet
+
+			file {
+				withXml {
+					def node = it.asNode()
+					// add Tomcat Runtime
+					node.appendNode("runtime", [name: config.eclipse.servletRuntime])
+				}
+		  	}
+		}
+	}
+}

@@ -1,0 +1,46 @@
+
+//
+//  default Tasks
+//
+
+task cleanResources(type: Delete) {
+	description "Deletes all ressources in the build directory"
+	
+	delete fileTree(dir: "${buildDir}/resources")
+}
+
+task javadocJar(type: Jar) {
+	description "Assembles a jar archive containing the javadoc files"
+	
+	classifier = 'javadoc'
+	from javadoc
+}
+
+task sourcesJar(type: Jar) {
+	description "Assembles a jar archive containing the source files"
+	
+	classifier = 'sources'
+	from sourceSets.main.allSource
+}
+
+task buildSnapshot(dependsOn: ["build"]) {
+	description "Assembles the outputs of this project for a SNAPSHOT Release."
+}
+
+task buildRelease(dependsOn: ["build"]) {
+	description "Assembles the outputs of this project for a Release."
+}
+
+task publishRelease {
+	description "Publish a RELEASE to a repository"
+	
+	dependsOn "buildRelease"
+	dependsOn "uploadArchives"
+}
+
+task publishSnapshot {
+	description "Publish a SNAPSHOT to a repository"
+	
+	dependsOn "buildSnapshot"
+	dependsOn "uploadArchives"
+}

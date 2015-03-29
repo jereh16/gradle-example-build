@@ -1,0 +1,29 @@
+// dependency has to be configured manually in build.gradle
+// buildscript.dependencies.classpath "com.bmuschko:gradle-tomcat-plugin:2.0"
+
+apply plugin: "com.bmuschko.tomcat"
+
+tomcat {
+	httpPort  = config.server.httpPort
+	httpsPort = config.server.httpsPort
+	enableSSL = true
+}
+
+tomcatRunWar {
+	stopPort = config.server.stopPort
+	stopKey  = config.server.stopKey
+	daemon   = true
+}
+
+tomcatStop {
+	stopPort = config.server.stopPort
+	stopKey  = config.server.stopKey
+}
+
+dependencies {
+	tomcat "org.apache.tomcat.embed:tomcat-embed-core:${config.server.version}"
+	tomcat "org.apache.tomcat.embed:tomcat-embed-logging-juli:${config.server.version}"
+	tomcat("org.apache.tomcat.embed:tomcat-embed-jasper:${config.server.version}") {
+		exclude group: 'org.eclipse.jdt.core.compiler', module: 'ecj'
+	}
+}
