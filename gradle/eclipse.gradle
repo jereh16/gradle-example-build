@@ -4,7 +4,7 @@ apply plugin: "eclipse-wtp"
 eclipse {
 	jdt {
 		 sourceCompatibility = config.java.source
-		 targetCompatibility = config.java.source
+		 targetCompatibility = config.java.target
 	}
 
 	project {
