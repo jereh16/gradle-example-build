@@ -11,7 +11,7 @@ lessc {
 	options.minify = false
 	options.sourceMap = true
 	options.sourceMapLessInline = true
-	options.sourceMapURL = "http://localhost:${config.server.httpPort}/$war.baseName/css/${project.name}.map"
+	options.sourceMapURL = "http://localhost:${config.server.httpPort}/${war.baseName}/css/${project.name}.map"
 }
 
 lesscDaemon {
