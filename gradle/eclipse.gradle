@@ -47,6 +47,7 @@ eclipse {
 		facet {
 			facet name: "jst.java", version: config.java.source
 			facet name: "jst.web",  version: config.java.servlet
+			facet name: "jpt.jpa",  version: config.java.jpa
 
 			file {
 				withXml {
