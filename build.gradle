@@ -64,7 +64,7 @@ dependencies {
 	def hibernate      = "4.3.+"
 	
 	compile "org.hibernate:hibernate-entitymanager:${hibernate}"
-    compile "org.hibernate:hibernate-ehcache:${hibernate}"
+	compile "org.hibernate:hibernate-ehcache:${hibernate}"
 	compile "org.hibernate:hibernate-validator:5.1.+"
 	compile "org.hibernate:hibernate-search-orm:5.1.+"
 	
@@ -77,12 +77,12 @@ dependencies {
 	compile "org.thymeleaf:thymeleaf-spring4:2.1.4.RELEASE"
 	
 	compile "org.springframework.security:spring-security-web:${springSecurity}"
-    compile "org.springframework.security:spring-security-config:${springSecurity}"
+	compile "org.springframework.security:spring-security-config:${springSecurity}"
 	compile "org.springframework.security:spring-security-taglibs:${springSecurity}"
 	
   	compile "jstl:jstl:1.2"
-    compile "joda-time:joda-time:2.+"
-    compile "mysql:mysql-connector-java:5.1.+"
+	compile "joda-time:joda-time:2.+"
+	compile "mysql:mysql-connector-java:5.1.+"
 	compile "com.zaxxer:HikariCP:2.3.+"
 	compile "commons-fileupload:commons-fileupload:1.3.+"
 	compile "org.codehaus.jackson:jackson-jaxrs:1.9.+"
@@ -95,10 +95,10 @@ dependencies {
 	compile "org.codehaus.groovy:groovy-all:2.4.1"
 	compile "com.googlecode.flyway:flyway-core:2.3.1"
 	
-    providedCompile "org.projectlombok:lombok:1.16.+"
-    providedCompile "javax.servlet:javax.servlet-api:3.1.+"
+	providedCompile "org.projectlombok:lombok:1.16.+"
+	providedCompile "javax.servlet:javax.servlet-api:3.1.+"
 	
-    testCompile "junit:junit:4.12"
+	testCompile "junit:junit:4.12"
 	testCompile "org.springframework:spring-test:${springVersion}"
 }
 
@@ -107,15 +107,15 @@ repositories {
 }
 
 buildscript {
-    repositories {
-        mavenCentral()
-    }
+	repositories {
+		mavenCentral()
+	}
     
-    dependencies {
+	dependencies {
 		classpath "com.github.houbie:lesscss-gradle-plugin:1.0.3-less-1.7.0"
 		classpath "com.bmuschko:gradle-tomcat-plugin:2.0"
 		classpath "org.flywaydb:flyway-gradle-plugin:3.1"
-    }
+	}
 }
 
 gradle.taskGraph.whenReady { taskGraph ->
@@ -136,5 +136,3 @@ gradle.taskGraph.whenReady { taskGraph ->
 	println "*** release configured for: '${version.conf}'\n"
 	println "*** building version: ${version}"
 }
-
-
