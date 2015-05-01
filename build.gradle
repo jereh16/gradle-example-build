@@ -11,17 +11,15 @@ apply from: "${rootDir}/gradle/release-tasks.gradle"
 // build a release by default
 defaultTasks "buildRelease"
 
-// using semantic versioning, see http://semver.org/
-group = "de.rehpoehler"
-archivesBaseName = "bankroll"
+group = "${config.project.group}"
+archivesBaseName = "${config.project.archiveBaseName}"
 
 // java config
-//sourceSets.main.java.srcDirs += ['src/main/jpa']
 sourceCompatibility = config.java.source
 compileJava.options.encoding = 'UTF-8'
 
 task wrapper(type: Wrapper) {
-	gradleVersion = '2.3'
+	gradleVersion = config.gradle.version
 }
 
 war {

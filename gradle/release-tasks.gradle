@@ -1,7 +1,33 @@
+//
+// some useful default tasks for building a release and publishing it to a repostitory
+// 
 
-//
-//  default Tasks
-//
+apply plugin: "maven"
+
+uploadArchives {
+	repositories {
+		mavenDeployer {
+			repository(url: config.repository.url) {
+				authentication(userName: config.repository.user, password: config.repository.password)
+			}
+  
+			snapshotRepository(url: config.repository.snapshot) {
+				authentication(userName: config.repository.user, password: config.repository.password)
+			}
+						
+			pom.project {
+				name "${project.name}"
+  
+				licenses {
+					license {
+						name "${config.license.name}"
+						url "${config.license.url}"
+					}
+				}
+			}
+		}
+	}
+}
 
 task cleanResources(type: Delete) {
 	description "Deletes all ressources in the build directory"
