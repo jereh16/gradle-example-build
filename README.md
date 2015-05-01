@@ -6,13 +6,13 @@
 - `eclipse.gradle`: eclipse + eclipse WTP configuration example
 - `less.gradle`: lessc configuration
 - `tomcat.gradle`: start/stop a tomcat server, usefull for integration testing
-- `release-tasks.gradle`: some default tasks usefull when releasing software (including publishing to a maven repository)
+- `release-tasks.gradle`: some default tasks, usefull when releasing software (including publishing to a maven repository)
 
 ## Usage:
 
 - copy the following files and directories into your project root: 
-  `build.gradle`, `version.properties`, `settings.gradle`, `config` and `gradle
-- change project name in `settings.gradle`
+  `build.gradle`, `version.properties`, `settings.gradle`, `config` and `gradle`
+- change project name in file `settings.gradle`
 - customize general build configuration by changing `config/gradle/default.config`
-- if necessary create a personal build configuration by creating `config/gradle/<username>.config`
+- if necessary create a personal build configuration by creating a `config/gradle/<username>.config` file
 - add additional plug-in configuration files to `config` directory, e.g. `config/checkstyle/checkstyle.xml`
