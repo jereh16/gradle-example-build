@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:sec="http://www.springframework.org/schema/security"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- not monitored by spring security -->
+	<sec:http pattern="/login"     security="none" />
+	<sec:http pattern="/logout"    security="none" />
+	<sec:http pattern="/impressum" security="none" />
+	<sec:http pattern="/oops"      security="none" />
+
+	<sec:http pattern="/js/**"    security="none" />
+	<sec:http pattern="/img/**"   security="none" />
+	<sec:http pattern="/fonts/**" security="none" />
+	<sec:http pattern="/css/**"   security="none" />
+
+	<!-- form based authentication for all other requests -->
+	<sec:http use-expressions="true">
+			
+		<!-- accesible for all users -->
+		<sec:intercept-url pattern="/" access="hasAnyAuthority('ROLE_ANONYMOUS', 'ROLE_USER')" />
+		<sec:intercept-url pattern="/registration" access="hasAnyAuthority('ROLE_ANONYMOUS', 'ROLE_USER')" />
+		<sec:intercept-url pattern="/confirm-email" access="hasAnyAuthority('ROLE_ANONYMOUS', 'ROLE_USER')" />
+		<sec:intercept-url pattern="/resend-confirmation-email" access="hasAnyAuthority('ROLE_ANONYMOUS', 'ROLE_USER')" />
+		<sec:intercept-url pattern="/request-new-password" access="hasAnyAuthority('ROLE_ANONYMOUS', 'ROLE_USER')" />
+		<sec:intercept-url pattern="/reset-password" access="hasAnyAuthority('ROLE_ANONYMOUS', 'ROLE_USER')" />
+		<sec:intercept-url pattern="/image/**" access="hasAnyAuthority('ROLE_ANONYMOUS', 'ROLE_USER')" />
+		<sec:intercept-url pattern="/explore/**" access="hasAnyAuthority('ROLE_ANONYMOUS', 'ROLE_USER')" />
+		<!-- authorized users -->
+		<sec:intercept-url pattern="/**" access="hasAuthority('ROLE_USER')" />
+
+		<sec:form-login login-page="/login" authentication-failure-url="/login?login_error=403" default-target-url="/userprofile" />
+		<sec:logout invalidate-session="true" logout-success-url="/" logout-url="/j_spring_security_logout" delete-cookies="SPRING_SECURITY_REMEMBER_ME_COOKIE" />
+		<sec:session-management invalid-session-url="/" />
+		<sec:remember-me key="me" />
+	</sec:http>
+
+	<sec:authentication-manager alias="authenticationManager">
+		<sec:authentication-provider user-service-ref="userDetailsService">
+			<sec:password-encoder ref="pwdEncoder" />
+		</sec:authentication-provider>
+	</sec:authentication-manager>
+
+	<bean id="userDetailsService" class="de.rehpoehler.user.services.UserDetailsService" />
+	<bean id="pwdEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
+	<bean id="loggerListener" class="org.springframework.security.authentication.event.LoggerListener" />
+</beans>

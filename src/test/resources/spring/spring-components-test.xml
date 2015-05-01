@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.1.xsd">
+
+	<bean id="mailSender" class="de.rehpoehler.test.MockEmailSender">
+		<property name="host" value="${mail.server.host}" />
+		<property name="port" value="${mail.server.port}" />
+		<property name="protocol" value="${mail.server.protocol}" />
+		<property name="username" value="${mail.server.username}" />
+		<property name="password" value="${mail.server.password}" />
+		<property name="javaMailProperties">
+			<util:properties location="classpath:javamail.properties" />
+		</property>
+	</bean>
+
+	<!-- THYMELEAF: Template Resolver for email templates -->
+	<bean id="emailTemplateResolver" class="org.thymeleaf.templateresolver.ClassLoaderTemplateResolver">
+		<property name="prefix" value="mail/" />
+		<property name="templateMode" value="HTML5" />
+		<property name="characterEncoding" value="UTF-8" />
+		<property name="order" value="1" />
+	</bean>
+
+	<!-- THYMELEAF: Template Engine -->
+	<bean id="templateEngine" class="org.thymeleaf.spring4.SpringTemplateEngine">
+		<property name="templateResolvers">
+            <set>
+                <ref bean="emailTemplateResolver" />
+                <!-- ref bean="webTemplateResolver" / -->
+            </set>
+        </property>
+	</bean>
+</beans>

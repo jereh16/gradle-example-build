@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:jpa="http://www.springframework.org/schema/data/jpa" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:jee="http://www.springframework.org/schema/jee" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="
+	   http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	   http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+	   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+	   http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd
+	   http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<!-- if you want to use a jndi/datasource -->
+	<!-- jee:jndi-lookup id="domainDataSource" jndi-name="${database.datasource}" cache="true" /-->
+
+	<util:map id="jpaPropertyMap">
+		<entry key="hibernate.dialect" value="${database.dialect}" />
+		<entry key="hibernate.hbm2ddl.auto" value="${database.hbm2ddl}" />
+		<entry key="hibernate.format_sql" value="${database.formatSql}" />
+		<entry key="hibernate.use_sql_comments" value="true" />
+		<entry key="hibernate.generate_statistics" value="true" />
+		<entry key="hibernate.ejb.naming_strategy" value-ref="namingStrategy" />
+
+		<!-- enable caching -->
+		<entry key="hibernate.cache.use_second_level_cache" value="true" />
+		<entry key="hibernate.cache.use_query_cache" value="true" />
+		<entry key="hibernate.cache.provider_class" value="org.hibernate.cache.EhCacheProvider" />
+		<entry key="hibernate.cache.region.factory_class" value="org.hibernate.cache.ehcache.EhCacheRegionFactory" />
+	</util:map>
+
+	<bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
+	    <property name="poolName" value="springHikariCP" />
+	    <property name="connectionTestQuery" value="SELECT 1" />
+	    <property name="dataSourceClassName" value="com.mysql.jdbc.jdbc2.optional.MysqlDataSource" />
+	    <property name="maximumPoolSize" value="10" />
+	    <property name="dataSourceProperties">
+        	<props>
+    	        <prop key="url">${database.connection}</prop>
+	            <prop key="user">${database.username}</prop>
+            	<prop key="password">${database.password}</prop>
+            	
+            	<prop key="cachePrepStmts">true</prop>
+            	<prop key="prepStmtCacheSize">250</prop>
+            	<prop key="prepStmtCacheSqlLimit">2048</prop>
+        	</props>
+    	</property>
+	</bean>
+
+	<bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+    	<constructor-arg ref="hikariConfig" />
+	</bean>
+
+    <bean id="namingStrategy" class="de.rehpoehler.persistence.PrefixNamingStrategy">
+        <property name="tablePrefix" value="${database.tablePrefix}"/>
+    </bean>
+
+	<bean id="jpaHibernateVendor" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+		<property name="showSql" value="${database.showSql}" />
+	</bean>
+
+	<bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="jpaVendorAdapter" ref="jpaHibernateVendor" />
+		<property name="jpaPropertyMap" ref="jpaPropertyMap" />
+		<property name="packagesToScan" value="de.rehpoehler" />
+		<property name="mappingResources" value="META-INF/orm.xml" />
+	</bean>
+
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory" />
+		<property name="jpaDialect">
+			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaDialect" />
+		</property>
+	</bean>
+
+	<bean class="org.springframework.data.web.config.SpringDataWebConfiguration" />
+	<bean id="auditorAware" class="de.rehpoehler.persistence.SpringSecurityAuditorAware" />
+
+	<jpa:repositories base-package="de.rehpoehler" />
+	<jpa:auditing auditor-aware-ref="auditorAware" />
+
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+</beans>
