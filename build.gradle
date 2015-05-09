@@ -4,9 +4,9 @@ apply plugin: "flyway"
 
 apply from: "${rootDir}/gradle/version+configuration.gradle"
 apply from: "${rootDir}/gradle/eclipse.gradle"
-apply from: "${rootDir}/gradle/tomcat.gradle"
 apply from: "${rootDir}/gradle/less.gradle"
 apply from: "${rootDir}/gradle/release-tasks.gradle"
+apply from: "${rootDir}/gradle/integration-test.gradle"
 
 // build a release by default
 defaultTasks "buildRelease"
@@ -26,11 +26,6 @@ war {
 	dependsOn "lessc"
 }
 
-test {
-	dependsOn tomcatRunWar
-	finalizedBy tomcatStop
-}
-
 javadoc {
 	failOnError = false
 }
@@ -47,10 +42,6 @@ task flywayResetDatabase << {
 	tasks.flywayClean.execute()
 	tasks.flywayBaseline.execute()
 	tasks.flywayMigrate.execute()
-}
-
-artifacts {
-	archives javadocJar, sourcesJar
 }
 
 assemble {

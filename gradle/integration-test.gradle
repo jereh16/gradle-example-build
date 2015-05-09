@@ -1,0 +1,54 @@
+//
+// Tasks and sourcesets for integration testing
+//
+
+apply from: "${rootDir}/gradle/tomcat.gradle"
+
+sourceSets {
+	integrationTest {
+		java {
+			compileClasspath += main.output + test.output
+			runtimeClasspath += main.output + test.output
+			
+			srcDir file('src/integration/java')
+		}
+		
+		resources.srcDir file('src/integration/resources')
+	}
+}
+
+configurations {
+	integrationTestCompile.extendsFrom testCompile
+	integrationTestRuntime.extendsFrom testRuntime
+}
+
+task integrationTest(type: Test) {
+	description "Runs the integration tests."
+
+	dependsOn tomcatRunWar
+	finalizedBy tomcatStop
+    mustRunAfter test
+
+	testClassesDir = sourceSets.integrationTest.output.classesDir
+	classpath = sourceSets.integrationTest.runtimeClasspath
+	
+	// uncomment if task should always run
+	// outputs.upToDateWhen { false }
+}
+
+task integrationSourcesJar(type: Jar) {
+	description "Assembles a jar archive containing the source files"
+	
+	classifier = 'integration-sources'
+	from sourceSets.integrationTest.allSource
+}
+
+check.dependsOn integrationTest
+
+tasks.withType(Test) {
+	reports.html.destination = file("${reporting.baseDir}/${name}")
+}
+
+artifacts {
+	archives integrationSourcesJar
+}

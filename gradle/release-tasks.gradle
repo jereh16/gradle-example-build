@@ -1,6 +1,6 @@
 //
 // some useful default tasks for building a release and publishing it to a repostitory
-// 
+//
 
 apply plugin: "maven"
 
@@ -49,6 +49,13 @@ task sourcesJar(type: Jar) {
 	from sourceSets.main.allSource
 }
 
+task testSourcesJar(type: Jar) {
+	description "Assembles a jar archive containing the source files"
+	
+	classifier = 'test-sources'
+	from sourceSets.test.allSource
+}
+
 task buildSnapshot(dependsOn: ["build"]) {
 	description "Assembles the outputs of this project for a SNAPSHOT Release."
 }
@@ -69,4 +76,8 @@ task publishSnapshot {
 	
 	dependsOn "buildSnapshot"
 	dependsOn "uploadArchives"
+}
+
+artifacts {
+	archives javadocJar, sourcesJar, testSourcesJar
 }
