@@ -7,6 +7,7 @@
 - `less.gradle`: lessc configuration
 - `tomcat.gradle`: start/stop a tomcat server, usefull for integration testing
 - `release-tasks.gradle`: some default tasks, usefull when releasing software (including publishing to a maven repository)
+- `integration-test.gradle`: sourceset and tasks for running integration tests (e.g. by using selenium)
 
 ## Usage:
 
