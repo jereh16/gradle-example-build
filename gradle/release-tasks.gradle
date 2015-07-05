@@ -17,13 +17,33 @@ uploadArchives {
 						
 			pom.project {
 				name "${project.name}"
-  
+				url "${config.project.url}"
+				
 				licenses {
 					license {
 						name "${config.license.name}"
 						url "${config.license.url}"
 					}
 				}
+				
+				if(plugins.hasPlugin("spring-boot")) {
+					println "*** Spring Boot available: configuring uploadArchives for Spring."
+					println "*** IMPORTANT: check if Spring Boot version in build.gradle (buildscript.dependencies) and release-tasks.gradle (uploadArchives) match!"
+					println "*** Publishing releases to: ${config.repository.url}"
+					println ""
+	
+					dependencyManagement {
+       		        	dependencies {
+	                    	dependency {
+                       			groupId "org.springframework.boot"
+               		            artifactId "spring-boot-dependencies"
+       		                    version "1.2.4.RELEASE"
+	                            type "pom"
+                           		scope "import"
+                           	}
+                       	}
+                   	}
+               	}
 			}
 		}
 	}
