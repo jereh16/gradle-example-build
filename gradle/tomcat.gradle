@@ -12,7 +12,7 @@ tomcat {
 tomcatRunWar {
 	stopPort = config.server.stopPort
 	stopKey  = config.server.stopKey
-	daemon   = true
+	daemon   = false
 }
 
 tomcatStop {
@@ -22,7 +22,7 @@ tomcatStop {
 
 dependencies {
 	tomcat "org.apache.tomcat.embed:tomcat-embed-core:${config.server.version}"
-	tomcat "org.apache.tomcat.embed:tomcat-embed-logging-juli:${config.server.version}"
+	tomcat "org.apache.tomcat.embed:tomcat-embed-logging-log4j:${config.server.version}"
 	tomcat("org.apache.tomcat.embed:tomcat-embed-jasper:${config.server.version}") {
 		exclude group: 'org.eclipse.jdt.core.compiler', module: 'ecj'
 	}

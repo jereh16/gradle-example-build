@@ -22,6 +22,10 @@ configurations {
 	integrationTestRuntime.extendsFrom testRuntime
 }
 
+tomcatRunWar {
+    daemon = true
+}
+
 task integrationTest(type: Test) {
 	description "Runs the integration tests."
 
