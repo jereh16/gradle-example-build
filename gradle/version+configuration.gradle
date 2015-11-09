@@ -9,26 +9,54 @@ ext {
 
 version = new Version(project.rootDir)
 
+defaultTasks "build"
+
+// publishing configuration
+group = config.project.group
+archivesBaseName = config.project.archiveBaseName
+
+// java config
+sourceCompatibility = config.java.source
+compileJava.options.encoding = "UTF-8"
+
+println "*** Using JDK: ${System.properties.'java.home'}"
+
+gradle.taskGraph.whenReady { taskGraph ->
+	
+	if( taskGraph.hasTask(buildRelease)) {
+		version.release = true
+		version.env = ""
+	}
+	else if (taskGraph.hasTask(buildSnapshot)) {
+		version.env = ""
+		version.conf = "SNAPSHOT"
+	}
+	else {
+		version.conf = "DEV"
+	}
+	
+	sourceSets.main.resources.srcDir "$rootDir/src/main/config/${version.env}"
+	
+ 	println "*** Building version ${version}\n"
+}
+
 /**
  * Version
  */
 class Version {
 	int major, minor, revision
 	boolean release
-	String conf = "USER"
+	String conf = ""
+	String env = "." + System.properties["user.name"]
 
 	String toString() {
-		"$major.$minor.$revision${release ? "" : "-" + conf}"
-	}
-	
-	String getConfiguration() {
-		return conf.toLowerCase()
+		"$major.$minor.$revision$env${release ? "" : "-" + conf}"
 	}
 	
 	Version(File rootDir) {
 		File versionFile = new File("${rootDir}/version.properties")
 		
-		if(!versionFile.exists()) {
+		if (!versionFile.exists()) {
 			throw new GradleException("Required version file does not exist: $versionFile.canonicalPath")
 		}
 		
@@ -36,7 +64,7 @@ class Version {
 
 		this.major    = versionProps.major
 		this.minor    = versionProps.minor
-		this.revision = versionProps.revision 
+		this.revision = versionProps.revision
 	}
 	
 	/**
@@ -50,13 +78,9 @@ class Version {
 	
 		def parsedConfig = new ConfigSlurper().parse(defaultConfigFile.toURL())
 		
-		if(userConfigFile.exists()) {
+		if (userConfigFile.exists()) {
 			def parsedUserConfig = new ConfigSlurper().parse(userConfigFile.toURL())
 			parsedConfig = parsedConfig.merge(parsedUserConfig)
-			
-			println "\n*** using *build* configuration for user: '${username}'"
-		} else {
-			println "\n*** using default *build* configuration!"
 		}
 		
 		return parsedConfig

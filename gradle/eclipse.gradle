@@ -1,4 +1,3 @@
-apply plugin: "eclipse"
 apply plugin: "eclipse-wtp"
 
 eclipse {
@@ -22,6 +21,9 @@ eclipse {
 		defaultOutputDir = file("build/classes-eclipse")
 		downloadSources = true
 
+        containers.remove('org.eclipse.jdt.launching.JRE_CONTAINER')
+        containers "org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-${config.java.source}"
+
 		file {
 			withXml {
 			  def node = it.asNode()
@@ -32,7 +34,7 @@ eclipse {
 				  .appendNode("attribute", [name: "owner.project.facets", value: "jst.web"])
 			  
 			  // remove web container to enable source.jars in eclipse
-			  node.remove( node.find { it.@path == 'org.eclipse.jst.j2ee.internal.web.container' } )
+			  // node.remove( node.find { it.@path == 'org.eclipse.jst.j2ee.internal.web.container' } )
 			}
 		}
 	}
@@ -58,4 +60,24 @@ eclipse {
 		  	}
 		}
 	}
+}
+
+eclipseJdt << {
+	// projects have UTF-8 encoding
+	File f = file('.settings/org.eclipse.core.resources.prefs')
+   	f.write('eclipse.preferences.version=1\n')
+    f.append('encoding/<project>=utf-8')
+    		
+	// and use unix linefeeds
+    f = file('.settings/org.eclipse.core.runtime.prefs')
+    f.write('eclipse.preferences.version=1\n')
+    f.append('line.separator=\\n')
+}
+
+cleanEclipseJdt << {
+	File f = file('.settings/org.eclipse.core.resources.prefs')
+	if (f.exists()) f.delete()
+	
+	f = file('.settings/org.eclipse.core.runtime.prefs')
+	if (f.exists()) f.delete()
 }

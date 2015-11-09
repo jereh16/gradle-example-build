@@ -1,0 +1,17 @@
+apply plugin: "flyway"
+
+flyway {
+	url = config.flyway.url
+	user = config.flyway.user
+	password = config.flyway.password
+	locations = ["filesystem:$rootDir/src/main/flyway"]
+}
+
+task flywayResetDatabase << { 
+	description "Cleans, baselines and migrates the database" 
+	group "Flyway"
+	
+	tasks.flywayClean.execute()
+	tasks.flywayBaseline.execute()
+	tasks.flywayMigrate.execute()
+}

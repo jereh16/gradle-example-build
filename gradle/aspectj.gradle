@@ -1,0 +1,70 @@
+/******************************
+ * if module is used, add the following to your build.gradle:
+ *
+    buildscript {
+        ext {
+            aspectjVersion = '1.8.4'  // should be customized
+            springVersion = '4.2.2.RELEASE' // should be customized
+        }
+        repositories {
+            maven { url "https://maven.eveoh.nl/content/repositories/releases" }
+        }
+        dependencies {
+            classpath "nl.eveoh:gradle-aspectj:1.5"
+        }
+    }
+ *****************************/
+
+apply plugin: "aspectj"
+
+println "*** Using AspectJ Version: ${aspectjVersion}"
+
+dependencies {
+	compile "org.aspectj:aspectjrt:${aspectjVersion}"
+	compile "org.springframework:spring-aspects:${springVersion}"
+	
+	runtime "org.aspectj:aspectjweaver:1.5.+"
+	
+	ajInpath "org.springframework:spring-aspects:${springVersion}"
+	ajInpath "org.aspectj:aspectjrt:${aspectjVersion}"
+
+	aspectpath "org.springframework:spring-aspects:${springVersion}"
+	aspectpath "org.aspectj:aspectjrt:${aspectjVersion}"
+}
+
+// eclipse: add aspectj nature to eclipse project
+if(plugins.hasPlugin("eclipse")) {
+    eclipse {
+        project {
+            buildCommand('org.eclipse.ajdt.core.ajbuilder')
+            natures += 'org.eclipse.ajdt.ui.ajnature'
+        }
+        classpath {
+            containers 'org.eclipse.ajdt.core.ASPECTJRT_CONTAINER'
+         
+            file {
+                withXml {
+
+                    def xmlparser = new XmlParser()
+                
+                    def node = it.asNode()
+                    node.findAll{it['@path'].contains('spring-aspects')}.each {
+                        def attributes = xmlparser.createNode(it, 'attributes', [:])
+                        def attNode = it.findAll{ it.name() == 'attributes'}.get(0)
+                    
+                        xmlparser.createNode(attNode, 'attribute', [name: 'org.eclipse.ajdt.inpath.restriction', value: "spring-aspects-${springVersion}.jar"]);
+                        xmlparser.createNode(attNode, 'attribute', [name: 'org.eclipse.ajdt.inpath', value: 'org.eclipse.ajdt.inpath']);
+                    }
+                
+                    node.findAll{it['@path'].contains('aspectjrt-')}.each {
+                        def attributes = xmlparser.createNode(it, 'attributes', [:])
+                        def attNode = it.findAll{ it.name() == 'attributes'}.get(0)
+                    
+                        xmlparser.createNode(attNode, 'attribute', [name: 'org.eclipse.ajdt.inpath.restriction', value: "aspectjrt-${aspectjVersion}.jar"]);
+                        xmlparser.createNode(attNode, 'attribute', [name: 'org.eclipse.ajdt.inpath', value: 'org.eclipse.ajdt.inpath']);
+                    }
+                }
+            }
+        }
+    }
+}

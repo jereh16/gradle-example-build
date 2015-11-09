@@ -1,0 +1,85 @@
+apply plugin: "checkstyle"
+apply plugin: "findbugs"
+apply plugin: "jdepend"
+apply plugin: "pmd"
+
+dependencies {
+    checkstyle "com.puppycrawl.tools:checkstyle:6.7"
+}
+
+checkstyle {
+    toolVersion
+    ignoreFailures = true
+    showViolations = false
+}
+
+def checkType
+
+task checkstyleReport << {
+    if (file("${buildDir}/reports/checkstyle/${checkType}.xml").exists()) {
+        ant.xslt(in: "${buildDir}/reports/checkstyle/${checkType}.xml",
+            style:"config/checkstyle/checkstyle-noframes.xsl",
+            out:"$buildDir/reports/checkstyle/checkstyle_${checkType}.html"
+        )
+    }
+}
+
+gradle.taskGraph.afterTask { Task task, TaskState state ->
+    if (task.name in ["checkstyleMain", "checkstyleTest"]) {
+        checkstyleReport {
+            def matcher = task.name =~ /^checkstyle(.*)$/
+            if (matcher.matches()) {
+                checkType = matcher.group(1).toLowerCase()
+            }
+        }
+        checkstyleReport.execute() 
+    }
+}
+
+findbugs {
+	ignoreFailures = true
+}
+
+findbugsMain {
+	excludes = ["**/gen/*"]
+	reports {
+		xml.enabled = false
+		html.enabled = true
+	}
+}
+
+jdepend {
+    ignoreFailures = true
+}
+
+tasks.withType(JDepend) {
+    reports {
+        text.enabled = true
+        xml.enabled = false
+    }
+}
+
+pmd {
+	ignoreFailures = true
+}
+
+tasks.withType(Pmd) {
+	excludes = ["**/gen/*"]
+	reports {
+    	xml.enabled = true
+    	html.enabled = true
+  	}
+}
+
+// add CPD to check
+check << {
+    File outDir = new File("${buildDir}/reports/cpd/")
+    outDir.mkdirs()
+    ant.taskdef(name: "cpd", classname: "net.sourceforge.pmd.cpd.CPDTask", classpath: configurations.pmd.asPath)
+    ant.cpd(minimumTokenCount: "50", format: "text", outputFile: new File(outDir , "cpd.txt")) {
+        fileset(dir: "src/main/java") {
+            include(name: "**/*.java")
+            exclude(name: "**/gen/*.java")
+        }
+    }
+}

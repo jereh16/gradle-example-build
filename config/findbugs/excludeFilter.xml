@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+
+	<!-- Don't check generated code -->
+    <Match>
+		<Class name="~.*\.gen\..*" />
+	</Match>
+
+	<!-- Allow mutable objects as return values for special types like Date -->
+	<Match>
+		<Bug code="EI" />
+		<Method returns="java.util.Date" />
+	</Match>
+
+	<!-- Generally allow mutable parameter -->
+	<Match>
+		<Bug code="EI2" />
+	</Match>
+
+	<!-- Ignore encoding warnings -->
+	<Match>
+		<Bug code="Dm" />
+	</Match>
+
+	<!-- Ignore mutable arrays -->
+	<Match>
+		<Bug code="MS" />
+		<Class name="de.rehpoehler.validator.ValidatorConstants" />
+	</Match>
+
+	<!-- Ignore performance warning "... makes inefficient use of keySet iterator instead of entrySet iterator" in tests-->
+	<Match>
+		<Bug code="WMI" />
+		<Class name="~Test" />
+	</Match>
+	
+	<!-- Allow unwritten public or protected fields -->
+	<Match>
+		<Bug code="UwF" />
+	</Match>
+
+
+</FindBugsFilter>

@@ -4,6 +4,26 @@
 
 apply plugin: "maven"
 
+test {
+	ignoreFailures = false
+	// exclusion of the test suites prevents double execution of test cases.
+	exclude '**/*Suite.class'
+}
+
+javadoc {
+	failOnError = false
+    exclude "**/gen/**"
+
+	if(System.properties.'java.home'.contains('1.8')) {
+		options.addStringOption('Xdoclint:none', '-quiet') // works only if using JDK 8
+	} 
+	
+	options.addStringOption('-quiet')
+	options.links = [
+      'http://docs.oracle.com/javase/8/docs/api/'
+    ]
+}
+
 uploadArchives {
 	repositories {
 		mavenDeployer {
@@ -29,8 +49,8 @@ uploadArchives {
 				if(plugins.hasPlugin("spring-boot")) {
 					println "*** Spring Boot available: configuring uploadArchives for Spring."
 					println "*** IMPORTANT: check if Spring Boot version in build.gradle (buildscript.dependencies) and release-tasks.gradle (uploadArchives) match!"
-					println "*** Publishing releases to: ${config.repository.url}"
 					println ""
+					println "*** Publishing releases to: ${config.repository.url}"
 	
 					dependencyManagement {
        		        	dependencies {
@@ -47,6 +67,10 @@ uploadArchives {
 			}
 		}
 	}
+}
+
+task wrapper(type: Wrapper) {
+	gradleVersion = config.gradle.version
 }
 
 task cleanResources(type: Delete) {
@@ -96,6 +120,10 @@ task publishSnapshot {
 	
 	dependsOn "buildSnapshot"
 	dependsOn "uploadArchives"
+}
+
+assemble {
+	dependsOn "cleanResources"
 }
 
 artifacts {
