@@ -48,21 +48,27 @@ uploadArchives {
 				
 				if(plugins.hasPlugin("spring-boot")) {
 					println "*** Spring Boot available: configuring uploadArchives for Spring."
-					println "*** IMPORTANT: check if Spring Boot version in build.gradle (buildscript.dependencies) and release-tasks.gradle (uploadArchives) match!"
-					println ""
 					println "*** Publishing releases to: ${config.repository.url}"
-	
+
+                    parent {
+                        groupId "org.springframework.boot"
+                        artifactId "spring-boot-starter-parent"
+                        version "${springBootVersion}"
+                    }
+
+/*
 					dependencyManagement {
        		        	dependencies {
 	                    	dependency {
                        			groupId "org.springframework.boot"
                		            artifactId "spring-boot-dependencies"
-       		                    version "1.2.4.RELEASE"
+       		                    version "${springBootVersion}"
 	                            type "pom"
                            		scope "import"
                            	}
                        	}
                    	}
+*/
                	}
 			}
 		}

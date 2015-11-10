@@ -1,6 +1,6 @@
 buildscript {
     ext {
-		springBootVersion = "1.3.0.RC1"      // <- if changed, you have to change uploadArchives in release-tasks.gradle too
+		springBootVersion = "1.3.0.RC1"
 		springVersion     = "4.2.2.RELEASE"  // used by aspectj.gradle
 		aspectjVersion    = "1.8.4"          // used by aspectj.gradle
 		springSession     = "1.0.2.RELEASE"
@@ -48,6 +48,9 @@ apply from: "${rootDir}/gradle/integration-test.gradle"
 
 // build a developer release by default
 defaultTasks "build"
+
+// (optional) ensure spring boot embedded tomcat matches tomcat set in configuration
+ext['tomcat.version'] = config.server.version
 
 // could be removed if not using less
 war {
