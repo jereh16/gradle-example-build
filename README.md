@@ -11,6 +11,7 @@
 - `aspectj.gradle`: aspectj integration, including eclipse project generation
 - `checks.gradle`: checkstyle, jdepend, pmd and findbugs
 - `flyway.gradle`: database migrations with flyway
+- `jacococ.gradle`: jacoco code coverage
 
 ## Usage:
 
