@@ -55,20 +55,6 @@ uploadArchives {
                         artifactId "spring-boot-starter-parent"
                         version "${springBootVersion}"
                     }
-
-/*
-					dependencyManagement {
-       		        	dependencies {
-	                    	dependency {
-                       			groupId "org.springframework.boot"
-               		            artifactId "spring-boot-dependencies"
-       		                    version "${springBootVersion}"
-	                            type "pom"
-                           		scope "import"
-                           	}
-                       	}
-                   	}
-*/
                	}
 			}
 		}

@@ -26,16 +26,13 @@ eclipse {
 
 		file {
 			withXml {
-			  def node = it.asNode()
+			    def node = it.asNode()
 
-			  // add Tomcat Runtime
-			  node.appendNode("classpathentry", [kind:"con", path: config.eclipse.servletRuntimeClasspath])
-				  .appendNode("attributes")
-				  .appendNode("attribute", [name: "owner.project.facets", value: "jst.web"])
-			  
-			  // remove web container to enable source.jars in eclipse
-			  // node.remove( node.find { it.@path == 'org.eclipse.jst.j2ee.internal.web.container' } )
-			}
+			    // add Tomcat Runtime
+		        node.appendNode("classpathentry", [kind:"con", path: config.eclipse.servletRuntimeClasspath])
+				    .appendNode("attributes")
+				    .appendNode("attribute", [name: "owner.project.facets", value: "jst.web"])
+		    }
 		}
 	}
 
@@ -64,20 +61,29 @@ eclipse {
 
 eclipseJdt << {
 	// projects have UTF-8 encoding
-	File f = file('.settings/org.eclipse.core.resources.prefs')
-   	f.write('eclipse.preferences.version=1\n')
-    f.append('encoding/<project>=utf-8')
+	File f = file(".settings/org.eclipse.core.resources.prefs")
+   	f.write("eclipse.preferences.version=1\n")
+    f.append("encoding/<project>=utf-8")
     		
 	// and use unix linefeeds
-    f = file('.settings/org.eclipse.core.runtime.prefs')
-    f.write('eclipse.preferences.version=1\n')
-    f.append('line.separator=\\n')
+    f = file(".settings/org.eclipse.core.runtime.prefs")
+    f.write("eclipse.preferences.version=1\n")
+    f.append("line.separator=\\n")
+    
+    // JPA settings
+    f = file(".settings/org.eclipse.jpt.core.prefs")
+    f.write("eclipse.preferences.version=1\n")
+    f.append("org.eclipse.jpt.core.platform=generic2_1\n")
+    f.append("org.eclipse.jpt.jpa.core.discoverAnnotatedClasses=true\n")
 }
 
 cleanEclipseJdt << {
-	File f = file('.settings/org.eclipse.core.resources.prefs')
+	File f = file(".settings/org.eclipse.core.resources.prefs")
 	if (f.exists()) f.delete()
 	
-	f = file('.settings/org.eclipse.core.runtime.prefs')
+	f = file(".settings/org.eclipse.core.runtime.prefs")
+	if (f.exists()) f.delete()
+	
+	f = file(".settings/org.eclipse.jpt.core.prefs")
 	if (f.exists()) f.delete()
 }

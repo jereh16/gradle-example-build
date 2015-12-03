@@ -19,7 +19,7 @@ task checkstyleReport << {
     if (file("${buildDir}/reports/checkstyle/${checkType}.xml").exists()) {
         ant.xslt(in: "${buildDir}/reports/checkstyle/${checkType}.xml",
             style:"config/checkstyle/checkstyle-noframes.xsl",
-            out:"$buildDir/reports/checkstyle/checkstyle_${checkType}.html"
+            out:"${buildDir}/reports/checkstyle/checkstyle_${checkType}.html"
         )
     }
 }

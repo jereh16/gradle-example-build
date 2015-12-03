@@ -4,9 +4,9 @@
 apply plugin: "lesscss"
 
 lessc {
-	sourceDir "${rootDir}/src/main/less"
+	sourceDir "${projectDir}/src/main/less"
 	include "${project.name}.less"
-	destinationDir = "${rootDir}/src/main/webapp/css"
+	destinationDir = "${projectDir}/src/main/webapp/css"
 
 	options.minify = false
 	options.sourceMap = true

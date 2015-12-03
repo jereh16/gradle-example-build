@@ -10,10 +10,10 @@ sourceSets {
 			compileClasspath += main.output + test.output
 			runtimeClasspath += main.output + test.output
 			
-			srcDir file('src/integration/java')
+			srcDir file("src/integration/java")
 		}
 		
-		resources.srcDir file('src/integration/resources')
+		resources.srcDir file("asrc/integration/resources")
 	}
 }
 
@@ -43,7 +43,7 @@ task integrationTest(type: Test) {
 task integrationSourcesJar(type: Jar) {
 	description "Assembles a jar archive containing the source files"
 	
-	classifier = 'integration-sources'
+	classifier = "integration-sources"
 	from sourceSets.integrationTest.allSource
 }
 

@@ -8,12 +8,10 @@ ext {
 }
 
 version = new Version(project.rootDir)
-
 defaultTasks "build"
 
 // publishing configuration
 group = config.project.group
-archivesBaseName = config.project.archiveBaseName
 
 // java config
 sourceCompatibility = config.java.source
@@ -32,10 +30,11 @@ gradle.taskGraph.whenReady { taskGraph ->
 		version.conf = "SNAPSHOT"
 	}
 	else {
+    	new File("${projectDir}/src/main/config/${username}").mkdir()
 		version.conf = "DEV"
 	}
-	
-	sourceSets.main.resources.srcDir "$rootDir/src/main/config/${version.env}"
+
+	sourceSets.main.resources.srcDir "${projectDir}/src/main/config/${version.env}"
 	
  	println "*** Building version ${version}\n"
 }
@@ -47,10 +46,10 @@ class Version {
 	int major, minor, revision
 	boolean release
 	String conf = ""
-	String env = "." + System.properties["user.name"]
+	String env = System.properties["user.name"]
 
 	String toString() {
-		"$major.$minor.$revision$env${release ? "" : "-" + conf}"
+		"$major.$minor.$revision${env != "" ? "." + env : ""}${release ? "" : "-" + conf}"
 	}
 	
 	Version(File rootDir) {
@@ -70,9 +69,7 @@ class Version {
 	/**
 	 * load user dependend build configuration
 	 */
-	static loadConfiguration(File rootDir, String username) {
-		new File("${rootDir}/src/main/config/${username}").mkdir()
-		
+	static loadConfiguration(File rootDir, String username) {		
 		File defaultConfigFile = new File("${rootDir}/config/gradle/default.config")
 		File userConfigFile = new File("${rootDir}/config/gradle/${username}.config")
 	

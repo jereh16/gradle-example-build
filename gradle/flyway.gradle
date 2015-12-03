@@ -4,7 +4,7 @@ flyway {
 	url = config.flyway.url
 	user = config.flyway.user
 	password = config.flyway.password
-	locations = ["filesystem:$rootDir/src/main/flyway"]
+	locations = ["filesystem:${projectDir}/src/main/flyway"]
 }
 
 task flywayResetDatabase << { 
