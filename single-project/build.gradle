@@ -1,0 +1,132 @@
+buildscript {
+    ext {
+		springBootVersion = "1.3.0.RC1"
+		springVersion     = "4.2.2.RELEASE"  // used by aspectj.gradle & io.spring.dependency-management
+		springSession     = "1.0.2.RELEASE"
+	    hibernate         = "5.0.3.Final"
+		aspectjVersion    = "1.8.4"          // used by aspectj.gradle
+	}
+
+	repositories {
+		jcenter()
+		maven { url "https://repo.spring.io/milestone" }
+		maven { url "https://maven.eveoh.nl/content/repositories/releases" } // for aspectj
+		maven { url "http://dl.bintray.com/robfletcher/gradle-plugins" } // for sass
+	}
+    
+	dependencies {
+		classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}" // if using spring boot
+        classpath "io.spring.gradle:dependency-management-plugin:0.5.4.RELEASE" // if using spring boot
+
+		classpath "com.github.houbie:lesscss-gradle-plugin:1.0.3-less-1.7.0"  // required for less.gradle
+		classpath "com.bmuschko:gradle-tomcat-plugin:2.0"  // required for tomcat.gradle and integration-test.gradle
+		classpath "org.flywaydb:flyway-gradle-plugin:3.1"  // required for flyway.gradle
+		classpath "nl.eveoh:gradle-aspectj:1.5"            // required for aspectj.gradle
+		classpath "com.github.robfletcher:compass-gradle-plugin:2.0.6" // required for sass.gradle
+	}
+}
+
+// define global vars
+ext {
+    // spring boot main class (required if using aspectj.gradle)
+    mainClassName = "de.rehpoehler.Application"
+    
+    // if using jacoco, define some excludes
+    jacocoExcludes = ['**/gen/**']
+    
+    // if using checks.gradle, define some excludes
+    checkExcludes =  ['**/gen/**']
+}
+
+apply plugin: "spring-boot"
+apply plugin: "io.spring.dependency-management"
+apply plugin: "java"
+apply plugin: "war"
+
+// required modules
+apply from: "${rootDir}/gradle/version+configuration.gradle"
+apply from: "${rootDir}/gradle/eclipse.gradle"
+apply from: "${rootDir}/gradle/release-tasks.gradle"
+
+// optional modules
+//apply from: "${rootDir}/gradle/less.gradle"
+apply from: "${rootDir}/gradle/sass.gradle"
+apply from: "${rootDir}/gradle/flyway.gradle"
+apply from: "${rootDir}/gradle/aspectj.gradle"
+apply from: "${rootDir}/gradle/integration-test.gradle"
+apply from: "${rootDir}/gradle/checks.gradle"
+apply from: "${rootDir}/gradle/jacoco.gradle"
+
+// build a developer release by default
+defaultTasks "build"
+
+// (optional) ensure spring boot embedded tomcat matches tomcat set in configuration
+ext['tomcat.version'] = config.server.version
+// (optional) ensure spring boot uses specified spring version
+ext['spring.version'] = springVersion
+
+// could be removed if not using less
+war {
+	dependsOn "lessc"
+}
+
+assemble {
+	dependsOn "cleanResources"
+	dependsOn "war"
+}
+
+configurations {
+    providedRuntime
+}
+
+repositories {
+	jcenter()
+    maven { url "https://repo.spring.io/milestone" }
+}
+
+
+dependencyManagement {
+    imports { 
+        mavenBom "org.springframework.cloud:spring-cloud-starter-parent:Brixton.M2" 
+    }
+}
+
+dependencies {
+	// aspectj: if used with spring
+	aspectpath "org.springframework:spring-aspects:${springVersion}"
+	
+	// spring boot: dependencies
+	compile "org.springframework.boot:spring-boot-starter-web" 
+	compile "org.springframework.boot:spring-boot-starter-security" 
+	compile "org.springframework.boot:spring-boot-starter-mail"
+    compile "org.springframework.boot:spring-boot-starter-data-jpa"
+    compile "org.springframework.boot:spring-boot-starter-validation"  // since 1.3
+	compile "org.springframework.boot:spring-boot-starter-cache"       // since 1.3
+
+    compile "org.springframework.boot:spring-boot-configuration-processor"	
+    compile "org.springframework.boot:spring-boot-devtools"           // since 1.3
+//	compile "org.springframework.boot:spring-boot-starter-actuator"   // potential security risk
+
+	compile "org.springframework.session:spring-session:${springSession}"
+	compile "org.thymeleaf:thymeleaf-spring4"
+
+	compile "joda-time:joda-time"
+	compile "org.projectlombok:lombok"
+	compile "com.googlecode.flyway:flyway-core:2.3.1"	
+
+    compile "org.hibernate:hibernate-core:${hibernate}"
+	compile "org.hibernate:hibernate-entitymanager:${hibernate}"
+	compile "org.hibernate:hibernate-ehcache:${hibernate}"
+	
+	// swagger: if using REST-APIs with swagger and spring	
+	compile "io.springfox:springfox-swagger2:2.0.0"
+
+    // logging	
+	compile "ch.qos.logback:logback-classic"
+	compile "org.codehaus.groovy:groovy-all:2.4.1"
+
+	providedRuntime "org.springframework.boot:spring-boot-starter-tomcat"
+	
+	testCompile "junit:junit:4.12"
+    testCompile "org.springframework.boot:spring-boot-starter-test"
+}

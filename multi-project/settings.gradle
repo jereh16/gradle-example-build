@@ -1,0 +1,3 @@
+
+include 'projekt-core'
+include 'projekt-client'

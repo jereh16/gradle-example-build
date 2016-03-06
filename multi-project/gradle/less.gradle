@@ -1,0 +1,24 @@
+// eventually add the following dependency manualle to build.gradle
+// buildscript.dependencies.classpath "com.github.houbie:lesscss-gradle-plugin:1.0.3-less-1.7.0"
+
+apply plugin: "lesscss"
+
+lessc {
+	sourceDir "${projectDir}/src/main/less"
+	include "${project.name}.less"
+	destinationDir = "${projectDir}/src/main/webapp/css"
+
+	options.minify = false
+	options.sourceMap = true
+	options.sourceMapLessInline = true
+	//options.sourceMapURL = "http://localhost:${config.server.httpPort}/${war.baseName}/css/${project.name}.map"
+}
+
+lesscDaemon {
+	description "Use from shell only! Compiles LESS files automatically on every file change."
+	lesscTaskName = "lessc"
+
+	engine = config.less.engine
+	lesscExecutable = config.less.executable
+	interval = config.less.daemonIntervall
+}

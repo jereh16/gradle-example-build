@@ -1,0 +1,30 @@
+apply plugin: "flyway"
+
+flyway {
+	url = config.flyway.url
+	user = config.flyway.user
+	password = config.flyway.password
+	locations = ["filesystem:$rootDir/src/main/flyway"]
+
+	placeholderPrefix = '#['
+    placeholderSuffix = ']'
+}
+
+flywayClean {
+	doFirst {
+		if (!config.flyway.allowClean) {
+			throw new GradleException("CLEANING DATABASE NOT PERMITTED!")
+		}
+	}
+}
+
+task flywayResetDatabase() { 
+	description "Cleans, baselines and migrates the database" 
+	group "Flyway"
+	
+	doFirst {
+		tasks.flywayClean.execute()
+		tasks.flywayBaseline.execute()
+		tasks.flywayMigrate.execute()
+	}
+}

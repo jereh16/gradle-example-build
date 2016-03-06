@@ -1,0 +1,78 @@
+//
+// some useful default tasks for building a release and publishing it to a repostitory
+//
+
+apply plugin: "maven"
+
+uploadArchives {
+	repositories {
+		mavenDeployer {
+			repository(url: config.repository.url) {
+				authentication(userName: config.repository.user, password: config.repository.password)
+			}
+  
+			snapshotRepository(url: config.repository.snapshot) {
+				authentication(userName: config.repository.user, password: config.repository.password)
+			}
+						
+			pom.project {
+				name "${project.name}"
+				url "${config.project.url}"
+				
+				licenses {
+					license {
+						name "${config.license.name}"
+						url "${config.license.url}"
+					}
+				}
+				
+				if(plugins.hasPlugin("spring-boot")) {
+					println "*** Spring Boot available: configuring uploadArchives for Spring."
+					println "*** Publishing releases to: ${config.repository.url}"
+
+                    parent {
+                        groupId "org.springframework.boot"
+                        artifactId "spring-boot-starter-parent"
+                        version "${springBootVersion}"
+                    }
+               	}
+			}
+		}
+	}
+}
+
+task wrapper(type: Wrapper) {
+	gradleVersion = config.gradle.version
+}
+
+task cleanResources(type: Delete) {
+	description "Deletes all ressources in the build directory"
+	
+	delete fileTree(dir: "${buildDir}/resources")
+}
+
+task buildSnapshot(dependsOn: ["build"]) {
+	description "Assembles the outputs of this project for a SNAPSHOT Release."
+}
+
+task buildRelease(dependsOn: ["build"]) {
+	description "Assembles the outputs of this project for a Release."
+}
+
+task publishRelease {
+	description "Publish a RELEASE to a repository"
+	
+	dependsOn "buildRelease"
+	dependsOn "uploadArchives"
+}
+
+task publishSnapshot {
+	description "Publish a SNAPSHOT to a repository"
+	
+	dependsOn "buildSnapshot"
+	dependsOn "uploadArchives"
+}
+
+assemble {
+	dependsOn "cleanResources"
+}

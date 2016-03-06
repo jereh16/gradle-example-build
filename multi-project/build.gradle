@@ -1,0 +1,139 @@
+/***
+ * projekt main build script
+ */
+
+buildscript {
+    ext {
+        springBootVersion = "1.3.+"
+        springSession     = "1.1.+"
+    	hibernate         = "5.1.+"
+    }
+    repositories {
+        jcenter()
+        maven { url "http://dl.bintray.com/robfletcher/gradle-plugins" }     // for sass
+        maven { url "https://maven.eveoh.nl/content/repositories/releases" } // aspectj
+    }    
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}") 
+        classpath("io.spring.gradle:dependency-management-plugin:0.5.+")
+		classpath "org.flywaydb:flyway-gradle-plugin:3.+"                     // required for flyway.gradle
+		classpath "com.bmuschko:gradle-tomcat-plugin:2.2.+"                   // required for tomcat.gradle and integration-test.gradle
+		classpath "nl.eveoh:gradle-aspectj:1.5"                               // required for aspectj.gradle
+        classpath "com.github.robfletcher:compass-gradle-plugin:2.0.6"        // required for sass.gradle
+  		classpath "com.github.houbie:lesscss-gradle-plugin:1.0.3-less-1.7.0"  // required for less.gradle
+   }
+}
+
+plugins {
+    id "org.flywaydb.flyway" version "4.0"
+}
+
+// define global vars
+ext {
+    // spring boot main class (required if using aspectj.gradle)
+    mainClassName = "de.project.Application"
+    
+    // if using jacoco, define some excludes
+    jacocoExcludes = ['**/gen/**']
+    
+    // if using checks.gradle, define some excludes
+    checkExcludes = ['**/gen/**']
+}
+
+println "*** Using JDK: ${System.properties.'java.home'}"
+
+apply plugin: "spring-boot"
+apply plugin: "war"
+
+apply from: "${rootDir}/gradle/version+configuration.gradle"
+apply from: "${rootDir}/gradle/release-tasks.gradle"
+
+// optional
+apply from: "${rootDir}/gradle/eclipse-wtp.gradle"
+apply from: "${rootDir}/gradle/flyway.gradle"
+
+// ensure spring boot embedded tomcat matches tomcat set in configuration
+ext['tomcat.version'] = config.server.version
+
+allprojects {
+    apply plugin: "io.spring.dependency-management"
+    apply from:   "${rootDir}/gradle/java.gradle"
+    apply from:   "${rootDir}/gradle/eclipse.gradle"
+    
+    // optional
+    apply from:   "${rootDir}/gradle/checks.gradle"
+    apply from:   "${rootDir}/gradle/jacoco.gradle"
+
+    defaultTasks "build"
+
+    // publishing configuration
+    group = config.project.group
+
+    // java config
+    sourceCompatibility = config.java.source
+    targetCompatibility = config.java.target
+    
+    repositories {
+        jcenter()
+        // maven { url "https://repo.spring.io/milestone" }
+    }
+	
+    dependencyManagement {
+        imports { 
+            mavenBom "io.spring.platform:platform-bom:2.0.+" 
+        }
+    }
+}
+
+bootRun {
+    addResources = true
+    bootRepackage.enabled = false
+}
+
+configurations {
+    providedRuntime
+}
+ 
+dependencies {
+    compile project(":projekt-core")
+    compile project(":projekt-client")
+
+    compile "org.springframework.boot:spring-boot-starter-web"
+	compile "org.springframework.boot:spring-boot-starter-cache"
+	compile "org.springframework.boot:spring-boot-starter-security"
+    compile "org.springframework.boot:spring-boot-devtools"
+	
+    compile "org.springframework.security:spring-security-taglibs"
+    compile "org.springframework.session:spring-session:${springSession}"
+    
+    compile "org.hibernate:hibernate-core:${hibernate}"
+    compile "org.hibernate:hibernate-entitymanager:${hibernate}"
+    compile "org.hibernate:hibernate-ehcache:${hibernate}"
+    compile "org.hibernate:hibernate-java8:${hibernate}"
+    
+    compile "jstl:jstl:1.2"
+    compile "commons-fileupload:commons-fileupload:1.3.+"
+    compile "org.codehaus.groovy:groovy-all:2.4.+"
+    compile "org.projectlombok:lombok"		
+
+    runtime "com.zaxxer:HikariCP:2.3.+"
+    runtime "mysql:mysql-connector-java:5.1.+"
+	
+    providedRuntime "org.springframework.boot:spring-boot-starter-tomcat"
+}
+
+gradle.taskGraph.whenReady { taskGraph ->
+	if( taskGraph.hasTask(buildRelease)) {
+		version.release = true
+		version.env = ""
+	}
+	else if (taskGraph.hasTask(buildSnapshot)) {
+		version.env = ""
+		version.conf = "SNAPSHOT"
+	}
+	else {
+		version.conf = "DEV"
+	}
+	
+ 	println "*** Building version ${version}\n"
+}

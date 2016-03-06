@@ -1,0 +1,1 @@
+{"version":3,"file":"/Users/jens/Workspaces/gradle/multi project/projekt-client/src/main/resources/META-INF/resources/css/projekt-client.css","sources":["projekt-client.less"],"names":[],"mappings":"AAAA,IAAI;EACH,gBAAA;EACA,mBAAA","sourcesContent":["body.withNav {\n\tmargin-top: 84px;\n\tmargin-bottom: 84px;\n}\n"]}

@@ -1,0 +1,24 @@
+apply plugin: "jacoco"
+
+test {
+    jacoco {
+        append = false
+        excludes = jacocoExcludes
+    }
+    
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled false
+    }
+
+    // jacoco: needed because the Jacoco-Gradle-Plugin has errors (https://issues.gradle.org/browse/GRADLE-2955)
+    afterEvaluate {
+        classDirectories = files( classDirectories.files.collect {
+            fileTree(dir: it, exclude: jacocoExcludes)
+        })
+    }
+}

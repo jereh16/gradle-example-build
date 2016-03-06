@@ -1,0 +1,14 @@
+/***
+ * projekt-client build script
+ */
+ 
+apply from: "${rootDir}/gradle/less.gradle"
+
+lessc {
+	destinationDir = "${projectDir}/src/main/resources/META-INF/resources/css"
+	options.sourceMapURL = "http://localhost:${config.server.httpPort}/${project.name}/css/${project.name}.map"
+}
+
+jar {
+    dependsOn "lessc"
+}

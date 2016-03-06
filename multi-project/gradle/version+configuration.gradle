@@ -1,0 +1,56 @@
+import java.io.File;
+
+ext {
+	// current user
+	username = System.properties["user.name"]
+	
+	config = Version.loadConfiguration(project.rootDir, username)
+}
+
+version = new Version(project.rootDir)
+
+/**
+ * Version
+ */
+class Version {
+	int major, minor, revision
+	boolean release = false
+	String conf = ""
+	String env = System.properties["user.name"]
+
+	String toString() {
+		"$major.$minor.$revision${release ? "" : "-" + conf}"
+	}
+	
+	Version(File rootDir) {
+		File versionFile = new File("${rootDir}/version.properties")
+		
+		if (!versionFile.exists()) {
+			throw new GradleException("Required version file does not exist: $versionFile.canonicalPath")
+		}
+		
+		def versionProps = new ConfigSlurper().parse(versionFile.toURL())
+
+		this.major    = versionProps.major
+		this.minor    = versionProps.minor
+		this.revision = versionProps.revision
+	}
+	
+	/**
+	 * load user dependend build configuration
+	 */
+	static loadConfiguration(File rootDir, String username) {
+		String path = "${rootDir}"
+		File defaultConfigFile = new File("${path}/config/gradle/default.config")
+		File userConfigFile = new File("${path}/config/gradle/${username}.config")
+	
+		def parsedConfig = new ConfigSlurper().parse(defaultConfigFile.toURL())
+		
+		if (userConfigFile.exists()) {
+			def parsedUserConfig = new ConfigSlurper().parse(userConfigFile.toURL())
+			parsedConfig = parsedConfig.merge(parsedUserConfig)
+		}
+		
+		return parsedConfig
+	}
+}

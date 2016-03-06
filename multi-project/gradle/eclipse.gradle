@@ -1,0 +1,75 @@
+apply plugin: "eclipse"
+
+eclipse {
+	jdt {
+		 sourceCompatibility = config.java.source
+		 targetCompatibility = config.java.target
+	}
+
+	project {
+		 natures = ['org.springframework.ide.eclipse.core.springnature',
+					'org.springsource.ide.eclipse.gradle.core.nature',
+					'org.eclipse.jdt.core.javanature',
+					'org.eclipse.xtext.ui.shared.xtextNature',
+					'org.eclipse.wst.common.modulecore.ModuleCoreNature',
+					'org.eclipse.wst.common.project.facet.core.nature']
+
+		 buildCommand 'org.springframework.ide.eclipse.core.springbuilder'
+	}
+
+	classpath {
+		defaultOutputDir = file("build/classes-eclipse")
+		downloadSources = true
+		
+		// containers.remove('org.eclipse.jdt.launching.JRE_CONTAINER')
+        // containers "org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-${config.java.source}"
+	}
+}
+
+eclipseJdt << {
+	// projects have UTF-8 encoding
+	File f = file(".settings/org.eclipse.core.resources.prefs")
+   	f.write("eclipse.preferences.version=1\n")
+    f.append("encoding/<project>=utf-8")
+    		
+	// and use unix linefeeds
+    f = file(".settings/org.eclipse.core.runtime.prefs")
+    f.write("eclipse.preferences.version=1\n")
+    f.append("line.separator=\\n")
+    
+    // JPA settings
+    f = file(".settings/org.eclipse.jpt.core.prefs")
+    f.write("eclipse.preferences.version=1\n")
+    f.append("org.eclipse.jpt.core.platform=generic2_1\n")
+    f.append("org.eclipse.jpt.jpa.core.discoverAnnotatedClasses=true\n")
+    
+    // Append project specific Code-Formatting
+    File jdtCore = new File("${projectDir}/.settings/org.eclipse.jdt.core.prefs")
+	File userJdtCore = new File("${rootDir}/gradle/eclipse/org.eclipse.jdt.core.prefs")
+    
+    if( userJdtCore.exists()) {
+        userJdtCore.withInputStream { input ->
+            jdtCore << input
+        }
+	}
+	
+	// project specific Save-Actions
+	File jdtUi = new File("${projectDir}/.settings/org.eclipse.jdt.ui.prefs")
+	File userJdtUi = new File("${rootDir}/gradle/eclipse/org.eclipse.jdt.ui.prefs")
+	
+	if( userJdtUi.exists()) {
+	    jdtUi << userJdtUi.text
+	}
+}
+
+cleanEclipseJdt << {
+    def files = [".settings/org.eclipse.core.resources.prefs",
+             ".settings/org.eclipse.core.runtime.prefs",
+             ".settings/org.eclipse.jpt.core.prefs",
+             ".settings/org.eclipse.jdt.ui.prefs"]
+    
+    files.each { eclipseFile ->
+    	File f = file(eclipseFile)
+	    if (f.exists()) f.delete()
+	}
+}

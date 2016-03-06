@@ -1,0 +1,16 @@
+// eventually add the following dependency manualle to build.gradle
+// buildscript.dependencies.classpath "com.github.houbie:lesscss-gradle-plugin:1.0.3-less-1.7.0"
+
+apply plugin: "com.github.robfletcher.compass"
+
+compass {
+  sassDir = file("${projectDir}/src/main/sass")
+
+  cssDir = file("${projectDir}/src/main/webapp/css")
+  imagesDir = file("${projectDir}/src/main/webapp/img")
+  javascriptsDir = file("${projectDir}/src/main/webapp/js")
+  fontsDir = file("${projectDir}/src/main/webapp/fonts")
+  
+  sourcemap = true
+  relativeAssets = true
+}

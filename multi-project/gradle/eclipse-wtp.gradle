@@ -1,0 +1,37 @@
+apply plugin: "eclipse-wtp"
+
+eclipse {
+    classpath.file {
+        withXml {
+            def node = it.asNode()
+
+            node.appendNode("classpathentry", [kind:"con", path: config.eclipse.servletRuntimeClasspath])
+                .appendNode("attributes")
+                .appendNode("attribute", [name: "owner.project.facets", value: "jst.web"])
+
+		    // remove web container to enable source.jars in eclipse
+		    // node.remove( node.find { it.@path == 'org.eclipse.jst.j2ee.internal.web.container' } )
+        }
+    }
+
+    wtp {
+        component {
+            //  wtp servlet context
+            contextPath = project.name
+            deployName = project.name
+        }
+
+        facet {
+            facet name: "jst.java", version: config.java.source
+            facet name: "jst.web",  version: config.java.servlet
+            facet name: "jpt.jpa",  version: config.java.jpa
+
+            file {
+                withXml {
+                    def node = it.asNode()
+                    node.appendNode("runtime", [name: config.eclipse.servletRuntime])
+                }
+            }
+        }
+    }
+}
