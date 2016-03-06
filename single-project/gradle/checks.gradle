@@ -4,7 +4,7 @@ apply plugin: "jdepend"
 apply plugin: "pmd"
 
 dependencies {
-    checkstyle "com.puppycrawl.tools:checkstyle:6.7"
+    checkstyle "com.puppycrawl.tools:checkstyle:6.16.+"
 }
 
 checkstyle {
@@ -41,7 +41,7 @@ findbugs {
 }
 
 findbugsMain {
-	excludes = ["**/gen/*"]
+	excludes = checkExcludes
 	reports {
 		xml.enabled = false
 		html.enabled = true
@@ -64,7 +64,7 @@ pmd {
 }
 
 tasks.withType(Pmd) {
-	excludes = ["**/gen/*"]
+	excludes = checkExcludes
 	reports {
     	xml.enabled = true
     	html.enabled = true

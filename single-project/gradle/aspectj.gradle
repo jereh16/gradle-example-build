@@ -28,6 +28,7 @@ dependencies {
 	ajInpath "org.springframework:spring-aspects:${springVersion}"
 	ajInpath "org.aspectj:aspectjrt:${aspectjVersion}"
 
+	// aspectj: if used with spring
 	aspectpath "org.springframework:spring-aspects:${springVersion}"
 	aspectpath "org.aspectj:aspectjrt:${aspectjVersion}"
 }

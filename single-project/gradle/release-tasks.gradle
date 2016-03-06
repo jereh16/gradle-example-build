@@ -4,26 +4,6 @@
 
 apply plugin: "maven"
 
-test {
-	ignoreFailures = false
-	// exclusion of the test suites prevents double execution of test cases.
-	exclude '**/*Suite.class'
-}
-
-javadoc {
-	failOnError = false
-    exclude "**/gen/**"
-
-	if(System.properties.'java.home'.contains('1.8')) {
-		options.addStringOption('Xdoclint:none', '-quiet') // works only if using JDK 8
-	} 
-	
-	options.addStringOption('-quiet')
-	options.links = [
-      'http://docs.oracle.com/javase/8/docs/api/'
-    ]
-}
-
 uploadArchives {
 	repositories {
 		mavenDeployer {
@@ -71,27 +51,6 @@ task cleanResources(type: Delete) {
 	delete fileTree(dir: "${buildDir}/resources")
 }
 
-task javadocJar(type: Jar) {
-	description "Assembles a jar archive containing the javadoc files"
-	
-	classifier = 'javadoc'
-	from javadoc
-}
-
-task sourcesJar(type: Jar) {
-	description "Assembles a jar archive containing the source files"
-	
-	classifier = 'sources'
-	from sourceSets.main.allSource
-}
-
-task testSourcesJar(type: Jar) {
-	description "Assembles a jar archive containing the source files"
-	
-	classifier = 'test-sources'
-	from sourceSets.test.allSource
-}
-
 task buildSnapshot(dependsOn: ["build"]) {
 	description "Assembles the outputs of this project for a SNAPSHOT Release."
 }
@@ -116,8 +75,4 @@ task publishSnapshot {
 
 assemble {
 	dependsOn "cleanResources"
-}
-
-artifacts {
-	archives javadocJar, sourcesJar, testSourcesJar
 }

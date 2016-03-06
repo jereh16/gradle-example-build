@@ -22,14 +22,13 @@ configurations {
 	integrationTestRuntime.extendsFrom testRuntime
 }
 
-tomcatRunWar {
-    daemon = true
-}
+tomcatRun.daemon = true
 
 task integrationTest(type: Test) {
 	description "Runs the integration tests."
 
-	dependsOn tomcatRunWar
+
+	dependsOn tomcatRun
 	finalizedBy tomcatStop
     mustRunAfter test
 

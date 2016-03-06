@@ -4,11 +4,22 @@
 apply plugin: "com.bmuschko.tomcat"
 
 tomcat {
+	stopPort = config.server.stopPort
+	stopKey  = config.server.stopKey
+
 	httpPort  = config.server.httpPort
 	httpsPort = config.server.httpsPort
-	enableSSL = true
+	
+	users {
+        user {
+            username = 'admin'
+            password = 'admin'
+            roles = ['developers', 'admin']
+        }
+    }
 }
 
+/*
 tomcatRunWar {
 	stopPort = config.server.stopPort
 	stopKey  = config.server.stopKey
@@ -19,6 +30,7 @@ tomcatStop {
 	stopPort = config.server.stopPort
 	stopKey  = config.server.stopKey
 }
+*/
 
 dependencies {
 	tomcat "org.apache.tomcat.embed:tomcat-embed-core:${config.server.version}"

@@ -11,18 +11,18 @@ buildscript {
 		jcenter()
 		maven { url "https://repo.spring.io/milestone" }
 		maven { url "https://maven.eveoh.nl/content/repositories/releases" } // for aspectj
-		maven { url "http://dl.bintray.com/robfletcher/gradle-plugins" } // for sass
+		maven { url "http://dl.bintray.com/robfletcher/gradle-plugins" }     // for sass
 	}
     
 	dependencies {
 		classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}" // if using spring boot
-        classpath "io.spring.gradle:dependency-management-plugin:0.5.4.RELEASE" // if using spring boot
+        classpath "io.spring.gradle:dependency-management-plugin:0.5.4.RELEASE"             // if using spring boot
 
 		classpath "com.github.houbie:lesscss-gradle-plugin:1.0.3-less-1.7.0"  // required for less.gradle
-		classpath "com.bmuschko:gradle-tomcat-plugin:2.0"  // required for tomcat.gradle and integration-test.gradle
-		classpath "org.flywaydb:flyway-gradle-plugin:3.1"  // required for flyway.gradle
-		classpath "nl.eveoh:gradle-aspectj:1.5"            // required for aspectj.gradle
-		classpath "com.github.robfletcher:compass-gradle-plugin:2.0.6" // required for sass.gradle
+		classpath "com.bmuschko:gradle-tomcat-plugin:2.2.1"                   // required for tomcat.gradle and integration-test.gradle
+		classpath "org.flywaydb:flyway-gradle-plugin:3.2"                     // required for flyway.gradle
+		classpath "nl.eveoh:gradle-aspectj:1.5"                               // required for aspectj.gradle
+		classpath "com.github.robfletcher:compass-gradle-plugin:2.0.6"        // required for sass.gradle
 	}
 }
 
@@ -40,22 +40,23 @@ ext {
 
 apply plugin: "spring-boot"
 apply plugin: "io.spring.dependency-management"
-apply plugin: "java"
 apply plugin: "war"
 
 // required modules
 apply from: "${rootDir}/gradle/version+configuration.gradle"
 apply from: "${rootDir}/gradle/eclipse.gradle"
 apply from: "${rootDir}/gradle/release-tasks.gradle"
+apply from: "${rootDir}/gradle/java.gradle"
 
 // optional modules
-//apply from: "${rootDir}/gradle/less.gradle"
-apply from: "${rootDir}/gradle/sass.gradle"
+apply from: "${rootDir}/gradle/eclipse-wtp.gradle"
+apply from: "${rootDir}/gradle/less.gradle"
 apply from: "${rootDir}/gradle/flyway.gradle"
-apply from: "${rootDir}/gradle/aspectj.gradle"
-apply from: "${rootDir}/gradle/integration-test.gradle"
+// apply from: "${rootDir}/gradle/integration-test.gradle"
 apply from: "${rootDir}/gradle/checks.gradle"
 apply from: "${rootDir}/gradle/jacoco.gradle"
+// apply from: "${rootDir}/gradle/aspectj.gradle"
+// apply from: "${rootDir}/gradle/sass.gradle"
 
 // build a developer release by default
 defaultTasks "build"
@@ -91,10 +92,7 @@ dependencyManagement {
     }
 }
 
-dependencies {
-	// aspectj: if used with spring
-	aspectpath "org.springframework:spring-aspects:${springVersion}"
-	
+dependencies {	
 	// spring boot: dependencies
 	compile "org.springframework.boot:spring-boot-starter-web" 
 	compile "org.springframework.boot:spring-boot-starter-security" 

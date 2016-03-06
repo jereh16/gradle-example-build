@@ -1,4 +1,4 @@
-apply plugin: "eclipse-wtp"
+apply plugin: "eclipse"
 
 eclipse {
 	jdt {
@@ -20,42 +20,9 @@ eclipse {
 	classpath {
 		defaultOutputDir = file("build/classes-eclipse")
 		downloadSources = true
-
-        containers.remove('org.eclipse.jdt.launching.JRE_CONTAINER')
-        containers "org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-${config.java.source}"
-
-		file {
-			withXml {
-			    def node = it.asNode()
-
-			    // add Tomcat Runtime
-		        node.appendNode("classpathentry", [kind:"con", path: config.eclipse.servletRuntimeClasspath])
-				    .appendNode("attributes")
-				    .appendNode("attribute", [name: "owner.project.facets", value: "jst.web"])
-		    }
-		}
-	}
-
-	wtp {
-		component {
-			//  wtp servlet context
-			contextPath = project.name
-			deployName = project.name
-		}
-
-		facet {
-			facet name: "jst.java", version: config.java.source
-			facet name: "jst.web",  version: config.java.servlet
-			facet name: "jpt.jpa",  version: config.java.jpa
-
-			file {
-				withXml {
-					def node = it.asNode()
-					// add Tomcat Runtime
-					node.appendNode("runtime", [name: config.eclipse.servletRuntime])
-				}
-		  	}
-		}
+		
+		// containers.remove('org.eclipse.jdt.launching.JRE_CONTAINER')
+        // containers "org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-${config.java.source}"
 	}
 }
 
@@ -75,15 +42,34 @@ eclipseJdt << {
     f.write("eclipse.preferences.version=1\n")
     f.append("org.eclipse.jpt.core.platform=generic2_1\n")
     f.append("org.eclipse.jpt.jpa.core.discoverAnnotatedClasses=true\n")
+    
+    // Append project specific Code-Formatting
+    File jdtCore = new File("${projectDir}/.settings/org.eclipse.jdt.core.prefs")
+	File userJdtCore = new File("${rootDir}/gradle/eclipse/org.eclipse.jdt.core.prefs")
+    
+    if( userJdtCore.exists()) {
+        userJdtCore.withInputStream { input ->
+            jdtCore << input
+        }
+	}
+	
+	// project specific Save-Actions
+	File jdtUi = new File("${projectDir}/.settings/org.eclipse.jdt.ui.prefs")
+	File userJdtUi = new File("${rootDir}/gradle/eclipse/org.eclipse.jdt.ui.prefs")
+	
+	if( userJdtUi.exists()) {
+	    jdtUi << userJdtUi.text
+	}
 }
 
 cleanEclipseJdt << {
-	File f = file(".settings/org.eclipse.core.resources.prefs")
-	if (f.exists()) f.delete()
-	
-	f = file(".settings/org.eclipse.core.runtime.prefs")
-	if (f.exists()) f.delete()
-	
-	f = file(".settings/org.eclipse.jpt.core.prefs")
-	if (f.exists()) f.delete()
+    def files = [".settings/org.eclipse.core.resources.prefs",
+             ".settings/org.eclipse.core.runtime.prefs",
+             ".settings/org.eclipse.jpt.core.prefs",
+             ".settings/org.eclipse.jdt.ui.prefs"]
+    
+    files.each { eclipseFile ->
+    	File f = file(eclipseFile)
+	    if (f.exists()) f.delete()
+	}
 }
