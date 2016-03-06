@@ -24,10 +24,6 @@ buildscript {
    }
 }
 
-plugins {
-    id "org.flywaydb.flyway" version "4.0"
-}
-
 // define global vars
 ext {
     // spring boot main class (required if using aspectj.gradle)
