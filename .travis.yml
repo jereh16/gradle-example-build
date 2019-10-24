@@ -1,4 +1,4 @@
 language: java
 
 script:
-  - ./gradlew build -s
+  - ./single-project/gradlew build -s
